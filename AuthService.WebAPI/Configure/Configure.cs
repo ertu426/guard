@@ -2,7 +2,7 @@
 
 public static class Configure
 {
-    public static void UseJwtApplication(this IApplicationBuilder app)
+    public static void UseApplication(this IApplicationBuilder app)
     {
         app.UseAuthentication();
         app.UseAuthorization();
