@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using AuthService.WebAPI.Models.Auth;
 using Microsoft.IdentityModel.Tokens;
 
 namespace AuthService.WebAPI.Utils.Jwt;
@@ -13,8 +14,8 @@ public class JwtHelper
     {
         _secretKey = secretKey;
     }
-
-    public string GenerateToken(string username)
+    
+    public string GenerateToken(User user)
     {
         if (_secretKey is null)
             throw new Exception("Secret key is null");
@@ -22,9 +23,16 @@ public class JwtHelper
         var tokenHandler = new JwtSecurityTokenHandler();
         
         var key = Encoding.ASCII.GetBytes(_secretKey);
+        
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Name, user.Username),
+            new Claim(ClaimTypes.Role, user.Role)
+        };
+        
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, username) }),
+            Subject = new ClaimsIdentity(claims),
             Expires = DateTime.UtcNow.AddDays(7),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
